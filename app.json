@@ -29,6 +29,7 @@
           "recordAudioAndroid": false
         }
       ],
+      ["expo-audio", { "microphonePermission": false, "recordAudioAndroid": false, "enableBackgroundPlayback": false }],
       "expo-secure-store",
       "expo-router",
       "expo-splash-screen",

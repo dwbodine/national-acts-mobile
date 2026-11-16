@@ -20,8 +20,9 @@ export async function request(path: string, options: { body?: unknown; token?: s
     });
     const data: unknown = await response.json().catch(() => null);
     if (!response.ok) {
-      const error = data as { msg?: string; errorMessage?: string } | null;
-      throw new ApiError(error?.msg || error?.errorMessage || `Request failed (${response.status}).`, response.status);
+      const error = data as { msg?: string; errorMessage?: string; message?: string; detail?: string } | null;
+      const message = [error?.msg, error?.errorMessage, error?.message, error?.detail].find(value => typeof value === 'string' && value.length > 0);
+      throw new ApiError(message || `Request failed (${response.status}).`, response.status);
     }
     return data;
   } catch (error) {

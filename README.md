@@ -14,7 +14,7 @@ Your phone must reach the API. `localhost` refers to the phone itself, so use a 
 ## Understand the pieces
 
 - [App.tsx](./App.tsx): header/logo, login gate, and function menu. [Route layout](./src/app/_layout.tsx) wraps Expo Router in the authentication provider.
-- [AuthProvider](./src/auth/AuthProvider.tsx): secure session persistence and logout. Passwords are never saved. The 24-hour local session matches the existing users app cookie lifetime. Server JWT expiry still governs requests; check-in HTTP 401 signs out.
+- [AuthProvider](./src/auth/AuthProvider.tsx): secure session persistence and logout. Passwords are never saved. The 24-hour local session matches the existing users app cookie lifetime. Server JWT expiry still governs requests; check-in HTTP 401 displays the authorization error without automatically signing out, since either the API key or token may have been rejected.
 - [auth.service.ts](./src/auth/auth.service.ts): existing login contract: POST `/user/login`, JSON `{ username, password }`, `x-api-key`, direct User response containing `isAuthenticated` and `token`. Logout clears the local session, matching the existing users app. Password-reset-required accounts must reset on the website.
 - [client.ts](./src/api/client.ts): URL configuration, Bearer token, timeout and HTTP errors.
 - [ticket.ts](./src/features/checkin/ticket.ts): QR parsing and result interpretation.

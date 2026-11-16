@@ -6,9 +6,11 @@ import { ApiError } from '../../api/client';
 import { Button, styles } from '../../components/ui';
 import { checkIn } from './checkin.service';
 import { getTicketId, resultMessage } from './ticket';
+import { useCheckInSound } from './useCheckInSound';
 
 export function CheckInScreen() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
+  const playCheckInSound = useCheckInSound();
   const [permission, requestPermission] = useCameraPermissions();
   const [active, setActive] = useState(AppState.currentState === 'active');
   const [result, setResult] = useState<{ text: string; id?: string; status?: number } | null>(null);
@@ -30,12 +32,15 @@ export function CheckInScreen() {
       id = getTicketId(data);
       const ticket = await checkIn(id, user.token);
       if (ticket.ticketId !== id) throw new Error('Server returned a different ticket. Please verify with staff.');
-      if (mounted.current) setResult({ text: resultMessage(ticket), id, status: ticket.checkInStatus });
+      if (mounted.current) {
+        setResult({ text: resultMessage(ticket), id, status: ticket.checkInStatus });
+        playCheckInSound(ticket.checkInStatus);
+      }
     } catch (e) {
       if (!mounted.current) return;
+      playCheckInSound();
       if (e instanceof ApiError && e.status === 401) {
-        try { await logout(); }
-        catch { setResult({ text: 'Session expired. Please sign out and sign in again.' }); }
+        setResult({ text: `Check-in authorization failed (401): ${e.message} Verify the API key and sign in again if the token has expired.`, id });
         return;
       }
       setResult({ text: e instanceof Error ? e.message : 'Unable to check in. Check your connection.', id });

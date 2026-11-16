@@ -15,6 +15,7 @@ test('API requests preserve login headers/body and Bearer check-in contract', as
     assert.deepEqual(JSON.parse(calls[0].init?.body as string), { username: 'staff', password: 'test' });
     await request('/mobile/ticket/checkin/abc', { token: 'staff-token' });
     assert.equal(new Headers(calls[1].init?.headers).get('Authorization'), 'Bearer staff-token');
+    assert.equal(new Headers(calls[1].init?.headers).get('x-api-key'), 'test-key');
     assert.equal(calls[1].init?.body, undefined);
   } finally { globalThis.fetch = original; }
 });
