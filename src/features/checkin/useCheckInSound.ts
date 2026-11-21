@@ -1,9 +1,11 @@
-import { useAudioPlayer } from 'expo-audio';
+import { useAudioPlayer } from "expo-audio";
 
 export function useCheckInSound() {
-  const success = useAudioPlayer(require('../../../assets/sounds/success.wav'));
-  const duplicate = useAudioPlayer(require('../../../assets/sounds/duplicate.wav'));
-  const failure = useAudioPlayer(require('../../../assets/sounds/failure.wav'));
+  const success = useAudioPlayer(require("../../../assets/sounds/success.wav"));
+  const duplicate = useAudioPlayer(
+    require("../../../assets/sounds/duplicate.wav"),
+  );
+  const failure = useAudioPlayer(require("../../../assets/sounds/failure.wav"));
 
   return (status?: number) => {
     const player = status === 1 ? success : status === 2 ? duplicate : failure;
@@ -15,7 +17,9 @@ export function useCheckInSound() {
         failure.pause();
         await player.seekTo(0);
         player.play();
-      } catch { /* The visible result remains available when audio cannot play. */ }
+      } catch {
+        /* The visible result remains available when audio cannot play. */
+      }
     })();
   };
 }

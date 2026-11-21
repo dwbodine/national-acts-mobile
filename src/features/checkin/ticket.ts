@@ -38,7 +38,11 @@ export function parseCheckIn(data: unknown): TicketCheckIn {
   const ticket = result as TicketCheckIn | null;
   if (!ticket) throw new Error("Check-in response is missing.");
   if (typeof ticket.ticketId !== "string")
-    throw new Error("Invalid ticket ID.");
+    throw new Error(
+      typeof ticket.errorMessage === "string" && ticket.errorMessage.trim()
+        ? `Invalid ticket - ${ticket.errorMessage.trim()}`
+        : "Invalid ticket",
+    );
   if (!Number.isInteger(ticket.checkInStatus))
     throw new Error("Invalid check-in status.");
   if (ticket.checkInStatus === 4 && typeof ticket.errorMessage !== "string")
@@ -62,6 +66,8 @@ export function resultMessage(ticket: TicketCheckIn): string {
       break;
     case 3:
       msg = "Not a valid ticket number";
+      if (typeof ticket.errorMessage === "string" && ticket.errorMessage.trim())
+        msg += `. ${ticket.errorMessage.trim()}`;
       break;
     default:
       msg = ticket.errorMessage || "Unable to check in this ticket.";

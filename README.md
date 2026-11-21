@@ -49,5 +49,4 @@ Run `npm run typecheck`, `npm test`, and `npx expo-doctor`. Before venue use, ve
 
 References: [Expo Camera](https://docs.expo.dev/versions/latest/sdk/camera/), [SecureStore](https://docs.expo.dev/versions/latest/sdk/securestore/).
 
-
 Dependency audit: npm reports five moderate advisories in Expo CLI/fingerprint glob dependencies. The suggested automatic fix downgrades Expo across major versions, so it has not been applied.

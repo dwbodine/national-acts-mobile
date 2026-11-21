@@ -9,7 +9,15 @@ export interface User {
   firstName?: string;
   lastName?: string;
   requireResetPassword?: boolean;
-  sellers?: { sellerId: number; sellerName?: string; roleId?: number; permissions?: number[]; routes?: string[]; hideSellerRate?: boolean; sellerType?: number }[];
+  sellers?: {
+    sellerId: number;
+    sellerName?: string;
+    roleId?: number;
+    permissions?: number[];
+    routes?: string[];
+    hideSellerRate?: boolean;
+    sellerType?: number;
+  }[];
   mobile?: string;
   notes?: string;
   createdAt?: string;
