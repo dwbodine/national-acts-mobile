@@ -8,6 +8,7 @@ import {
   View,
 } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
+import { router, useLocalSearchParams } from "expo-router";
 import { useAuth } from "../../auth/AuthProvider";
 import { ApiError } from "../../api/client";
 import { Button, styles } from "../../components/ui";
@@ -16,9 +17,11 @@ import { getTicketId, resultMessage } from "./ticket";
 import { useCheckInSound } from "./useCheckInSound";
 
 import { EventSelection } from "../events/EventSelection";
+import { CheckInSummary } from "../events/CheckInSummary";
 import { useEvents } from "../events/EventsProvider";
 
 export function CheckInScreen() {
+  const { scan } = useLocalSearchParams<{ scan?: string }>();
   const { entries, sellerId, eventId } = useEvents();
   const event =
     sellerId === undefined
@@ -26,7 +29,7 @@ export function CheckInScreen() {
       : entries[sellerId]?.events.find(
           (item) => item.originalEventId === eventId,
         );
-  const [scanning, setScanning] = useState(false);
+  const [scanning, setScanning] = useState(scan === "1");
   if (!scanning || !event)
     return (
       <ScrollView contentContainerStyle={styles.content}>
@@ -54,6 +57,7 @@ function Scanner({ onClose }: { onClose: () => void }) {
       : entries[sellerId]?.events.find(
           (item) => item.originalEventId === eventId,
         );
+  const tickets = (event?.orders ?? []).flatMap((order) => order.tickets ?? []);
   const { user } = useAuth();
   const playCheckInSound = useCheckInSound();
   const [permission, requestPermission] = useCameraPermissions();
@@ -147,6 +151,17 @@ function Scanner({ onClose }: { onClose: () => void }) {
       <Text style={styles.title}>
         {event?.eventTitle || event?.title || "Ticket check-in"}
       </Text>
+      <CheckInSummary tickets={tickets} />
+      <Button
+        title="Show Attendee List"
+        disabled={busy}
+        onPress={() =>
+          router.replace({
+            pathname: "/[feature]",
+            params: { feature: "attendees" },
+          })
+        }
+      />
       <Text style={styles.text}>
         Point the camera at a ticket&apos;s QR code. Keep the result visible
         until you&apos;re ready for the next guest.

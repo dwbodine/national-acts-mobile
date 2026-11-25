@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { router } from "expo-router";
 import {
   ActivityIndicator,
   FlatList,
@@ -10,6 +11,7 @@ import {
 } from "react-native";
 import { Button, styles, colors } from "../../components/ui";
 import { EventSelection } from "./EventSelection";
+import { CheckInSummary } from "./CheckInSummary";
 import { useEvents } from "./EventsProvider";
 import { useAuth } from "../../auth/AuthProvider";
 import { checkIn } from "../checkin/checkin.service";
@@ -119,12 +121,19 @@ export function AttendeesScreen() {
           <View style={{ gap: 18, marginBottom: 18 }}>
             <Text style={styles.title}>Event attendees</Text>
             <EventSelection />
+            <Button
+              title="Back to Scanner"
+              disabled={!event || busy}
+              onPress={() =>
+                router.replace({
+                  pathname: "/[feature]",
+                  params: { feature: "checkin", scan: "1" },
+                })
+              }
+            />
             {event && (
               <>
-                <Text style={styles.text}>
-                  {attendees.filter((item) => item.ticket.isCheckedIn).length}{" "}
-                  checked in out of {attendees.length} tickets
-                </Text>
+                <CheckInSummary tickets={attendees.map(({ ticket }) => ticket)} />
                 <TextInput
                   style={styles.input}
                   value={search}
@@ -188,7 +197,7 @@ export function AttendeesScreen() {
               <Text
                 style={[
                   styles.text,
-                  { color: item.ticket.isCheckedIn ? colors.muted : colors.accent, fontWeight: "700" },
+                  { color: item.ticket.isCheckedIn ? "#7ee2a8" : "#ffb5b5", fontWeight: "700" },
                 ]}
               >
                 {item.name}

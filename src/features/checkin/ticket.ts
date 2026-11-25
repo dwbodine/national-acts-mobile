@@ -4,7 +4,8 @@ export interface TicketCheckIn {
   ticketId: string;
   checkInStatus: number;
   checkInTime?: string;
-  errorMessage: string;
+  errorMessage?: string;
+  ticketHolderName?: string | null;
 }
 
 function validate(value: unknown): string {
@@ -51,26 +52,28 @@ export function parseCheckIn(data: unknown): TicketCheckIn {
 }
 
 export function resultMessage(ticket: TicketCheckIn): string {
+  const name = ticket.ticketHolderName?.trim();
   const time = ticket.checkInTime
     ? moment(ticket.checkInTime).format("h:mm A")
     : "";
   let msg = "";
   switch (ticket.checkInStatus) {
     case 1:
-      msg = "Checked in";
+      msg = name ? `${name} checked in` : "Checked in";
       if (time) msg += ` at ${time}`;
       break;
     case 2:
-      msg = "Already checked in";
+      msg = name ? `${name} already checked in` : "Already checked in";
       if (time) msg += ` at ${time}`;
       break;
     case 3:
-      msg = "Not a valid ticket number";
+      msg = name ? `${name} — not a valid ticket number` : "Not a valid ticket number";
       if (typeof ticket.errorMessage === "string" && ticket.errorMessage.trim())
         msg += `. ${ticket.errorMessage.trim()}`;
       break;
     default:
       msg = ticket.errorMessage || "Unable to check in this ticket.";
+      if (name) msg = `${name} — ${msg}`;
       break;
   }
   return msg;

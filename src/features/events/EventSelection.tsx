@@ -144,7 +144,11 @@ export function EventSelection() {
     };
   }, [sellerId, load, retry]);
   const events =
-    sellerId === undefined ? [] : (entries[sellerId]?.events ?? []);
+    sellerId === undefined
+      ? []
+      : (entries[sellerId]?.events ?? []).filter((event) =>
+          event.orders?.some((order) => (order.tickets?.length ?? 0) > 0),
+        );
   return (
     <View style={{ gap: 16 }}>
       <Dropdown
@@ -165,16 +169,23 @@ export function EventSelection() {
       <Dropdown
         label="Event"
         value={eventId}
-        options={events.map((event) => ({
-          id: event.originalEventId,
-          label: [
+        options={events.map((event) => {
+          const tickets = (event.orders ?? []).flatMap(
+            (order) => order.tickets ?? [],
+          );
+          const checkedIn = tickets.filter((ticket) => ticket.isCheckedIn).length;
+          const label = [
             event.eventTitle || event.title || `Event ${event.originalEventId}`,
             event.eventDate,
             event.venue?.name,
           ]
             .filter(Boolean)
-            .join(" - "),
-        }))}
+            .join(" - ");
+          return {
+            id: event.originalEventId,
+            label: `${label} (${checkedIn}/${tickets.length})`,
+          };
+        })}
         onSelect={selectEvent}
         disabled={
           sellerId === undefined || loading || !!error || !events.length
@@ -184,7 +195,7 @@ export function EventSelection() {
       {!!error && <Text style={styles.error}>{error}</Text>}
       {sellerId !== undefined && !loading && !error && !events.length && (
         <Text style={styles.text}>
-          No events are available for this seller.
+          No events with tickets sold are available for this seller.
         </Text>
       )}
       {sellerId !== undefined && (
